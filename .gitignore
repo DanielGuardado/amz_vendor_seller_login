@@ -1,0 +1,6 @@
+.wdm/
+__pycache__/
+chrome_profile/
+config/
+env/
+tmp/
