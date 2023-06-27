@@ -6,15 +6,23 @@ from google.auth.transport.requests import Request
 from googleapiclient.errors import HttpError
 import base64
 from bs4 import BeautifulSoup
+from googleapiclient.errors import HttpError
+from email.mime.text import MIMEText
+import base64
+import socket
+import getpass
+import os
+
 
 # If modifying these SCOPES, delete the file token.pickle.
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+SCOPES = [
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.send",
+]
 
 
-def get_code():
-    """Shows basic usage of the Gmail API.
-    Lists the user's Gmail labels.
-    """
+def get_gmail_service():
+    """Return a service that interacts with the Gmail API."""
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -35,7 +43,11 @@ def get_code():
         with open("config/token.pickle", "wb") as token:
             pickle.dump(creds, token)
 
-    service = build("gmail", "v1", credentials=creds)
+    return build("gmail", "v1", credentials=creds)
+
+
+def get_code():
+    service = get_gmail_service()
 
     # Call the Gmail API
     results = (
@@ -84,3 +96,46 @@ def get_code():
 
         except HttpError as error:
             print(f"An error occurred: {error}")
+
+
+def create_message(sender, to, subject, message_text):
+    """Create a message for an email."""
+    message = MIMEText(message_text)
+    message["to"] = ", ".join(to)
+    message["from"] = sender
+    message["subject"] = subject
+    return {"raw": base64.urlsafe_b64encode(message.as_bytes()).decode()}
+
+
+def send_message(service, user_id, message):
+    """Send an email message."""
+    try:
+        message = (
+            service.users().messages().send(userId=user_id, body=message).execute()
+        )
+        print("Message Id: %s" % message["id"])
+        return message
+    except HttpError as error:
+        print(f"An error occurred: {error}")
+
+
+def send_email(subject, body, SENDER_EMAIL, RECIPIENT_EMAILS):
+    service = get_gmail_service()
+    current_dir = os.getcwd()
+    folder_name = os.path.basename(current_dir)
+    computer_name = socket.gethostname()
+    user_name = getpass.getuser()
+    new_line = "\n"
+    body_with_new_line = (
+        f"{body}{new_line}{folder_name} on {computer_name} ({user_name})"
+    )
+    full_subject = f"{subject} : {folder_name}"
+
+    try:
+        message = create_message(
+            SENDER_EMAIL, RECIPIENT_EMAILS, full_subject, body_with_new_line
+        )
+        send_message(service, "me", message)
+        print("Email sent successfully.")
+    except Exception as e:
+        print(f"Error sending email: {e}")
