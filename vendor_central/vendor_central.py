@@ -13,9 +13,10 @@ class VendorCentral:
         sender_email,
         recipient_emails,
         driver=None,
+        download_path=None,
     ):
         if driver is None:
-            self.driver = get_default_driver()
+            self.driver = get_default_driver(download_path)
         else:
             self.driver = driver
         self.driver_actions = WebDriverActions(self.driver)

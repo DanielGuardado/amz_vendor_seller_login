@@ -46,9 +46,10 @@ def init_driver(chrome_profile_path, download_path=os.getcwd()):
         return driver
 
 
-def get_default_driver():
+def get_default_driver(download_path=None):
+    if not download_path:
+        current_date_time = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
+        download_path = os.path.join(os.getcwd(), "tmp", current_date_time)
     chrome_profile_path = os.path.join(os.getcwd(), "chrome_profile")
-    current_date_time = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
-    download_path = os.path.join(os.getcwd(), "tmp", current_date_time)
     driver = init_driver(chrome_profile_path, download_path)
     return driver

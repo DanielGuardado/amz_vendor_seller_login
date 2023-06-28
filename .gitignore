@@ -4,3 +4,6 @@ chrome_profile/
 config/
 env/
 tmp/
+dist/
+Setup.py
+amazon_login.egg-info/
