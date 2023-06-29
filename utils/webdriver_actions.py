@@ -43,3 +43,12 @@ class WebDriverActions:
     def get(self, url):
         """Navigate to a URL."""
         self.driver.get(url)
+
+    def quit(self):
+        """Quit the browser."""
+        self.driver.quit()
+
+    @property
+    def current_url(self):
+        """Get the current URL."""
+        return self.driver.current_url

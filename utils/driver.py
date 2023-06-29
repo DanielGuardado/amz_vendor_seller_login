@@ -7,14 +7,18 @@ from datetime import datetime
 
 
 class ChromeDriver:
-    def __init__(self, download_path=None):
+    def __init__(
+        self,
+        type,
+        download_path=None,
+    ):
         if not download_path:
             current_date_time = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
             self.download_path = os.path.join(os.getcwd(), "tmp", current_date_time)
         else:
             self.download_path = download_path
 
-        self.chrome_profile_path = os.path.join(os.getcwd(), "chrome_profile")
+        self.chrome_profile_path = os.path.join(os.getcwd(), f"chrome_profile_{type}")
         self.driver = self.init_driver(self.chrome_profile_path, self.download_path)
 
     @staticmethod

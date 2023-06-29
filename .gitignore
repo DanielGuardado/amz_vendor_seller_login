@@ -7,3 +7,5 @@ tmp/
 dist/
 Setup.py
 amazon_login.egg-info/
+chrome_profile_seller_central/
+chrome_profile_vendor_central/

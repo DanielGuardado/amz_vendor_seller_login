@@ -1,9 +1,10 @@
-from vendor_central.vendor_login import VendorLogin
+# from vendor_central.vendor_login import VendorLogin
 from utils.webdriver_actions import WebDriverActions
 from utils.driver import ChromeDriver
+from amazon_services.login import Login
 
 
-class VendorCentral:
+class AmazonManager:
     def __init__(
         self,
         username,
@@ -12,13 +13,14 @@ class VendorCentral:
         logged_in_element,
         sender_email,
         recipient_emails,
+        type,
         chrome_driver=None,
         download_path=None,
     ):
         if chrome_driver is None:
-            chrome_driver = ChromeDriver(download_path)
+            chrome_driver = ChromeDriver(type, download_path)
         self.driver_actions = WebDriverActions(chrome_driver)
-        self.login_module = VendorLogin(
+        self.login_module = Login(
             self.driver_actions,
             username,
             password,
@@ -26,6 +28,7 @@ class VendorCentral:
             logged_in_element,
             sender_email,
             recipient_emails,
+            type,
         )
 
     def login(self):
