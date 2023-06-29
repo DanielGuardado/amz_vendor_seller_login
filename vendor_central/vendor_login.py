@@ -31,7 +31,7 @@ class VendorLogin:
 
     def login(self):
         """Login to the Vendor Central site."""
-        self.driver_actions.driver.get(self.login_link)
+        self.driver_actions.get(self.login_link)
         if self.is_logged_in():
             print("Already logged in.")
         else:

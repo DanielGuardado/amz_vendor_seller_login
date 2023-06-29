@@ -1,6 +1,6 @@
 from vendor_central.vendor_login import VendorLogin
 from utils.webdriver_actions import WebDriverActions
-from utils.driver import get_default_driver
+from utils.driver import ChromeDriver
 
 
 class VendorCentral:
@@ -12,14 +12,12 @@ class VendorCentral:
         logged_in_element,
         sender_email,
         recipient_emails,
-        driver=None,
+        chrome_driver=None,
         download_path=None,
     ):
-        if driver is None:
-            self.driver = get_default_driver(download_path)
-        else:
-            self.driver = driver
-        self.driver_actions = WebDriverActions(self.driver)
+        if chrome_driver is None:
+            chrome_driver = ChromeDriver(download_path)
+        self.driver_actions = WebDriverActions(chrome_driver)
         self.login_module = VendorLogin(
             self.driver_actions,
             username,

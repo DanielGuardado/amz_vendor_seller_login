@@ -7,6 +7,7 @@ from config.config import (
     SENDER_EMAIL,
     RECIPIENT_EMAILS,
 )
+from selenium.webdriver.common.by import By
 
 
 vendor_central = VendorCentral(
@@ -18,4 +19,7 @@ vendor_central = VendorCentral(
     RECIPIENT_EMAILS,
 )
 vendor_central.login()
+csrf_link = "https://vendorcentral.amazon.com/hz/vendor/members/products/mycatalog?ref_=vc_xx_subNav"
+token_name = "csrfToken"
+token = vendor_central.driver_actions.get_csrf_token(csrf_link, By.NAME, token_name)
 print("test")
