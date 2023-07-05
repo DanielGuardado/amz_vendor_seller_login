@@ -20,12 +20,12 @@ token = vendor_central.driver_actions.get_csrf_token(
     VENDOR_CENTRAL_CONFIG["csrf_config"]["token_name"],
 )
 
-print(token)
+# print(token)
 
-print("test")
-sleep(5)
-vendor_central.driver_actions.quit()
-sleep(5)
+# print("test")
+# sleep(5)
+# vendor_central.driver_actions.quit()
+# sleep(5)
 
 seller_central = AmazonManager(
     SELLER_CENTRAL_CONFIG["amazon_login"]["username"],

@@ -52,3 +52,7 @@ class WebDriverActions:
     def current_url(self):
         """Get the current URL."""
         return self.driver.current_url
+
+    def is_element_present(self, by_criterion, criterion_value):
+        elements = self.driver.find_elements(by_criterion, criterion_value)
+        return len(elements) > 0
