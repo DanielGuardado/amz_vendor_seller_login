@@ -57,7 +57,9 @@ class Login:
         if is_logged_in:
             print("Already logged in.")
         else:
-            is_on_login_screen = self.on_screen(self.amazon_xpaths["sign_on_xpath"])
+            is_on_login_screen = self.on_screen(
+                self.amazon_xpaths["sign_on_xpath"]
+            ) or self.on_screen(self.amazon_xpaths["sign_on_xpath_2"])
             if is_on_login_screen:
                 self.perform_login()
             is_on_otp_screen = self.on_screen(self.amazon_xpaths["otp_xpath"])
@@ -94,6 +96,9 @@ class Login:
                 pass
 
         self.driver_actions.enter_text(By.NAME, self.PASSWORD_NAME, self.password)
+        checkbox = self.driver_actions.get_element(By.NAME, "rememberMe")
+        if not checkbox.is_selected():
+            checkbox.click()
         self.driver_actions.click_element(By.ID, self.SUBMIT_BUTTON_ID)
 
     def handle_otp(self):
