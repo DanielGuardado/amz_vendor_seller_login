@@ -1,8 +1,7 @@
 from utils.webdriver_actions import WebDriverActions
 from utils.gmail_helper import get_code, send_email
 
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+
 from selenium.webdriver.common.by import By
 
 
@@ -53,22 +52,32 @@ class Login:
     def login(self):
         """Login to the Vendor Central site."""
         self.driver_actions.get(self.login_link)
-        is_logged_in = self.on_screen(self.amazon_xpaths["logged_in_xpath"])
+        is_logged_in = self.driver_actions.on_screen(
+            By.XPATH, self.amazon_xpaths["logged_in_xpath"]
+        )
         if is_logged_in:
             print("Already logged in.")
         else:
-            is_on_login_screen = self.on_screen(
-                self.amazon_xpaths["sign_on_xpath"]
-            ) or self.on_screen(self.amazon_xpaths["sign_on_xpath_2"])
+            is_on_login_screen = self.driver_actions.on_screen(
+                By.XPATH, self.amazon_xpaths["sign_on_xpath"]
+            ) or self.driver_actions.on_screen(
+                By.XPATH, self.amazon_xpaths["sign_on_xpath_2"]
+            )
             if is_on_login_screen:
                 self.perform_login()
-            is_on_otp_screen = self.on_screen(self.amazon_xpaths["otp_xpath"])
+            is_on_otp_screen = self.driver_actions.on_screen(
+                By.XPATH, self.amazon_xpaths["otp_xpath"]
+            )
             if is_on_otp_screen:
                 self.handle_otp()
-            is_on_merchant_screen = self.on_screen(self.amazon_xpaths["merchant_xpath"])
+            is_on_merchant_screen = self.driver_actions.on_screen(
+                By.XPATH, self.amazon_xpaths["merchant_xpath"]
+            )
             if is_on_merchant_screen:
                 self.handle_merchant_screen()
-            is_logged_in = self.on_screen(self.amazon_xpaths["logged_in_xpath"])
+            is_logged_in = self.driver_actions.on_screen(
+                By.XPATH, self.amazon_xpaths["logged_in_xpath"]
+            )
 
         if not is_logged_in:
             print("Login failed.")
@@ -77,15 +86,6 @@ class Login:
             print("Logged in successfully.")
 
         return is_logged_in
-
-    def on_screen(self, element):
-        try:
-            self.driver_actions.wait.until(
-                EC.presence_of_element_located((By.XPATH, element))
-            )
-            return True
-        except TimeoutException:
-            return False
 
     def perform_login(self):
         """Perform the actual login operation."""
@@ -112,14 +112,14 @@ class Login:
         if self.type == "seller_central":
             self.select_account()
 
-    def select_account(self):
-        self.driver_actions.click_element(
-            By.XPATH,
-            self.SELLER_CENTRAL_MERCHANT_USA,
-        )
-        self.driver_actions.click_element(
-            By.XPATH, self.SELLER_CENTRAL_MERCHANT_SELECT_ACCOUNT
-        )
+    # def select_account(self):
+    #     self.driver_actions.click_element(
+    #         By.XPATH,
+    #         self.SELLER_CENTRAL_MERCHANT_USA,
+    #     )
+    #     self.driver_actions.click_element(
+    #         By.XPATH, self.SELLER_CENTRAL_MERCHANT_SELECT_ACCOUNT
+    #     )
 
     def handle_vendor_central_otp(self):
         code = get_code()
@@ -143,12 +143,27 @@ class Login:
             self.select_account()
 
     def select_account(self):
-        self.driver_actions.click_element(
-            By.XPATH, self.SELLER_CENTRAL_ACCOUNT_SCREEN_COUNTRY_XPATH
-        )
-        self.driver_actions.click_element(
-            By.XPATH, self.SELLER_CENTRAL_ACCOUNT_SCREEN_COUNTRY_SUBMIT_XPATH
-        )
+        try:
+            self.driver_actions.scroll_down_element(
+                By.XPATH, '//*[@id="picker-container"]/div/div[2]/div/div[3]'
+            )
+        except:
+            pass
+        try:
+            self.driver_actions.click_element(
+                By.XPATH, self.SELLER_CENTRAL_ACCOUNT_SCREEN_COUNTRY_XPATH
+            )
+            self.driver_actions.click_element(
+                By.XPATH, self.SELLER_CENTRAL_ACCOUNT_SCREEN_COUNTRY_SUBMIT_XPATH
+            )
+        except:
+            print("Select account type")
+            if self.driver_actions.on_screen(
+                By.XPATH, self.amazon_xpaths["logged_in_xpath"], override_wait_time=120
+            ):
+                return
+            else:
+                raise Exception("Failed to select account type")
 
     def send_login_failure_email(self):
         send_email(

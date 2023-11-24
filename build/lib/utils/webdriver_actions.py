@@ -1,5 +1,6 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 
 class WebDriverActions:
@@ -7,6 +8,18 @@ class WebDriverActions:
         self.driver = chrome_driver.driver
         self.download_path = chrome_driver.download_path
         self.wait = WebDriverWait(self.driver, wait_time)
+
+    def on_screen(self, by_criterion, element, override_wait_time=None):
+        wait_time = (
+            override_wait_time or self.wait._timeout
+        )  # Using _timeout from existing wait instance if no override is provided
+        local_wait = WebDriverWait(self.driver, wait_time)
+
+        try:
+            local_wait.until(EC.presence_of_element_located((by_criterion, element)))
+            return True
+        except TimeoutException:
+            return False
 
     def enter_text(self, by_criterion, criterion_value, text):
         element = self.wait.until(
@@ -63,40 +76,11 @@ class WebDriverActions:
         elements = self.driver.find_elements(by_criterion, criterion_value)
         return len(elements) > 0
 
-    # def click_element_inside_shadow_root(
-    #     self, host_criterion, host_value, internal_selector=None, open_first=False
-    # ):
-    #     """
-    #     Clicks on an element inside a shadow root or the host element itself.
-
-    #     :param host_criterion: The criterion to locate the host element.
-    #     :param host_value: The value for the criterion to locate the host element.
-    #     :param internal_selector: The CSS selector to find the element inside the shadow root.
-    #                             If None, the host element is clicked.
-    #     :param open_first: If True, clicks on the host element before clicking on the internal element.
-    #     """
-    #     host_element = self.wait.until(
-    #         EC.presence_of_element_located((host_criterion, host_value))
-    #     )
-
-    #     if open_first:
-    #         host_element.click()
-
-    #     if internal_selector:
-    #         # JavaScript to pierce through the shadow boundary and find the desired element
-    #         js_script = """
-    #         let hostElement = arguments[0];
-    #         let shadowRoot = hostElement.shadowRoot;
-    #         return shadowRoot.querySelector(arguments[1]);
-    #         """
-
-    #         # Execute the JavaScript and get the element inside the shadow root
-    #         internal_element = self.driver.execute_script(
-    #             js_script, host_element, internal_selector
-    #         )
-
-    #         # Click on the retrieved element
-    #         internal_element.click()
+    def scroll_down_element(self, by_criterion, criterion_value, index=0):
+        element = self.get_element(by_criterion, criterion_value, index)
+        self.driver.execute_script(
+            "arguments[0].scrollTop = arguments[0].scrollHeight", element
+        )
 
     def interact_with_element_inside_shadow_root(
         self,
